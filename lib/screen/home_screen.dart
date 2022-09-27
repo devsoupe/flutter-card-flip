@@ -1,7 +1,7 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 
-import 'asset_image_name.dart';
+import '../constant/flip_card_core.dart';
 
 class HomeScreen extends StatefulWidget {
   final String title;
@@ -16,24 +16,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _imageNames = [
-    AssetImageName.orange,
-    AssetImageName.banana,
-    AssetImageName.apple,
-    AssetImageName.strawberry,
-  ];
-
-  List<String> _randomImageNames = [];
-  List<GlobalKey<FlipCardState>> _cardKeys = [];
-
-  int _frontCardCount = 0;
-  final List<int> _frontCardIndexes = [];
+  FlipCardCore flipCardCore = FlipCardCore();
 
   @override
   void initState() {
     super.initState();
 
-    reset();
+    flipCardCore.reset();
   }
 
   @override
@@ -47,9 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
           spacing: 4,
           runSpacing: 4,
           children: List.generate(
-            _randomImageNames.length,
-            (index) {
-              if (_randomImageNames[index].isEmpty) {
+            flipCardCore.randomImageNames.length,
+                (index) {
+              if (flipCardCore.randomImageNames[index].isEmpty) {
                 return Container(
                   width: 90,
                   height: 150,
@@ -57,18 +46,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
               return FlipCard(
-                key: _cardKeys[index],
+                key: flipCardCore.cardKeys[index],
                 onFlip: () {
-                  _frontCardCount++;
-                  _frontCardIndexes.add(index);
+                  flipCardCore.increaseFrontCardCount();
+                  flipCardCore.frontCardIndexes.add(index);
                 },
                 onFlipDone: (bool) {
-                  if (_frontCardCount == 2) {
-                    _toggleCardToFront();
-
-                    _checkCardIsEqual();
-
-                    _frontCardCount = 0;
+                  if (flipCardCore.frontCardCount == 2) {
+                    flipCardCore.toggleCardToFront();
+                    setState(() {
+                      flipCardCore.checkCardIsEqual();
+                    });
                   }
                 },
                 front: Container(
@@ -79,12 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 back: Container(
                   width: 90,
                   height: 150,
-                  child: _randomImageNames[index].isEmpty
-                      ? null
-                      : Image.asset(
-                          _randomImageNames[index],
-                          fit: BoxFit.cover,
-                        ),
+                  child: Image.asset(
+                    flipCardCore.randomImageNames[index],
+                    fit: BoxFit.cover,
+                  ),
                 ),
               );
             },
@@ -94,49 +80,11 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            reset();
+            flipCardCore.reset();
           });
         },
         child: Icon(Icons.refresh),
       ),
     );
-  }
-
-  void _toggleCardToFront() {
-    for (var cardKey in _cardKeys) {
-      if (!(cardKey.currentState?.isFront ?? false)) {
-        cardKey.currentState?.toggleCard();
-      }
-    }
-  }
-
-  void _checkCardIsEqual() {
-    if (_frontCardIndexes.length >= 2) {
-      String firstCardName = _randomImageNames[_frontCardIndexes[0]];
-      String secondCardName = _randomImageNames[_frontCardIndexes[1]];
-      if (firstCardName == secondCardName) {
-        _randomImageNames[_frontCardIndexes[0]] = '';
-        _randomImageNames[_frontCardIndexes[1]] = '';
-
-        setState(() {});
-      }
-    }
-
-    _frontCardIndexes.clear();
-  }
-
-  void reset() {
-    // add 2 times
-    _randomImageNames.clear();
-    _randomImageNames.addAll(_imageNames);
-    _randomImageNames.addAll(_imageNames);
-
-    // shuffle
-    _randomImageNames.shuffle();
-
-    // create global key
-    _frontCardCount = 0;
-    _cardKeys.clear();
-    _cardKeys.addAll(_randomImageNames.map((_) => GlobalKey<FlipCardState>()));
   }
 }
