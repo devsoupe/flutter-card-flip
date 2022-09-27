@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 
 import '../screen/asset_image_name.dart';
 
+enum FlipCardCoreEvent { resetCard, equalCard }
+
 class FlipCardCore {
   final _imageNames = [
     AssetImageName.orange,
@@ -27,9 +29,9 @@ class FlipCardCore {
 
   List<int> get frontCardIndexes => _frontCardIndexes;
 
-  final StreamController<int> _streamController = StreamController();
+  final StreamController<FlipCardCoreEvent> _streamController = StreamController();
 
-  Stream<int>? get stream => _streamController.stream;
+  Stream<FlipCardCoreEvent>? get stream => _streamController.stream;
 
   void increaseFrontCardCount() {
     _frontCardCount++;
@@ -57,7 +59,7 @@ class FlipCardCore {
     _cardKeys.clear();
     _cardKeys.addAll(_randomImageNames.map((_) => GlobalKey<FlipCardState>()));
 
-    _streamController.add(0);
+    _streamController.add(FlipCardCoreEvent.resetCard);
   }
 
   void checkCardIsEqual() {
@@ -67,6 +69,8 @@ class FlipCardCore {
       if (firstCardName == secondCardName) {
         _randomImageNames[_frontCardIndexes[0]] = '';
         _randomImageNames[_frontCardIndexes[1]] = '';
+
+        _streamController.add(FlipCardCoreEvent.equalCard);
       }
     }
 
