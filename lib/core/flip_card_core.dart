@@ -28,6 +28,7 @@ class FlipCardCore {
   List<int> get frontCardIndexes => _frontCardIndexes;
 
   final StreamController<int> _streamController = StreamController();
+
   Stream<int>? get stream => _streamController.stream;
 
   void increaseFrontCardCount() {
