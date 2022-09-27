@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../screen/asset_image_name.dart';
-
 
 class FlipCardCore {
   final _imageNames = [
@@ -25,6 +26,9 @@ class FlipCardCore {
   int get frontCardCount => _frontCardCount;
 
   List<int> get frontCardIndexes => _frontCardIndexes;
+
+  final StreamController<int> _streamController = StreamController();
+  Stream<int>? get stream => _streamController.stream;
 
   void increaseFrontCardCount() {
     _frontCardCount++;
@@ -51,6 +55,8 @@ class FlipCardCore {
     _frontCardCount = 0;
     _cardKeys.clear();
     _cardKeys.addAll(_randomImageNames.map((_) => GlobalKey<FlipCardState>()));
+
+    _streamController.add(0);
   }
 
   void checkCardIsEqual() {

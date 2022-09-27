@@ -1,7 +1,7 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 
-import '../constant/flip_card_core.dart';
+import '../core/flip_card_core.dart';
 
 class HomeScreen extends StatefulWidget {
   final String title;
@@ -22,6 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
+    flipCardCore.stream?.listen((event) {
+      if (event == 0) {
+        setState(() {});
+      }
+    });
     flipCardCore.reset();
   }
 
@@ -79,9 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            flipCardCore.reset();
-          });
+          flipCardCore.reset();
         },
         child: Icon(Icons.refresh),
       ),
