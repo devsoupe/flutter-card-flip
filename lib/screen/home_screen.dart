@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: StreamBuilder<FlipCardCoreEvent>(
           stream: flipCardCore.stream,
           builder: (context, snapshot) {
-            print("AAAA ${snapshot.data}");
             if (snapshot.data == null) {
               return Container();
             } else if (snapshot.data == FlipCardCoreEvent.resetCard || snapshot.data == FlipCardCoreEvent.equalCard) {
@@ -42,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   spacing: 4,
                   runSpacing: 4,
                   children: List.generate(
-                    flipCardCore.randomImageNames.length,
+                    flipCardCore.randomImageNamesSize,
                     (index) {
-                      if (flipCardCore.randomImageNames[index].isEmpty) {
+                      if (flipCardCore.getRandomImageNameIsEmpty(index)) {
                         return Container(
                           width: 90,
                           height: 150,
@@ -52,16 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }
                       return FlipCard(
-                        key: flipCardCore.cardKeys[index],
+                        key: flipCardCore.getCardKey(index),
                         onFlip: () {
-                          flipCardCore.increaseFrontCardCount();
-                          flipCardCore.frontCardIndexes.add(index);
+                          flipCardCore.flip(index);
                         },
                         onFlipDone: (bool) {
-                          if (flipCardCore.frontCardCount == 2) {
-                            flipCardCore.toggleCardToFront();
-                            flipCardCore.checkCardIsEqual();
-                          }
+                          flipCardCore.flipDone();
                         },
                         front: Container(
                           width: 90,
@@ -72,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 90,
                           height: 150,
                           child: Image.asset(
-                            flipCardCore.randomImageNames[index],
+                            flipCardCore.getRandomImageName(index),
                             fit: BoxFit.cover,
                           ),
                         ),
