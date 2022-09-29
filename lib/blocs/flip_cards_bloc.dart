@@ -46,18 +46,34 @@ class FlipCardsBloc extends Bloc<FlipCardsEvent, FlipCardsState> {
   }
 
   void _checkCardIsEqual(Emitter<FlipCardsState> emit) {
-    if (_frontCardIndexes.length >= 2) {
-      String firstCardName = state.flipCards.randomImageNames[_frontCardIndexes[0]];
-      String secondCardName = state.flipCards.randomImageNames[_frontCardIndexes[1]];
-      if (firstCardName == secondCardName) {
-        state.flipCards.randomImageNames[_frontCardIndexes[0]] = '';
-        state.flipCards.randomImageNames[_frontCardIndexes[1]] = '';
+    bool isMatch = false;
 
-        emit(state.copyWith(flipCards: state.flipCards));
+    if (_frontCardIndexes.length >= 2) {
+      if (_frontCardIndexes[0] != _frontCardIndexes[1]) {
+        String firstCardName = state.flipCards.randomImageNames[_frontCardIndexes[0]];
+        String secondCardName = state.flipCards.randomImageNames[_frontCardIndexes[1]];
+        if (firstCardName == secondCardName) {
+          state.flipCards.randomImageNames[_frontCardIndexes[0]] = '';
+          state.flipCards.randomImageNames[_frontCardIndexes[1]] = '';
+
+          isMatch = true;
+          emit(state.copyWith(flipCards: state.flipCards));
+        }
+      } else {
+        _frontCardIndexes.removeAt(_frontCardIndexes.length - 1);
+        _frontCardCount--;
       }
     }
 
-    _frontCardIndexes.clear();
-    _frontCardCount = 0;
+    if (isMatch) {
+      Future.delayed(const Duration(microseconds: 200), () {
+        _frontCardIndexes.clear();
+        _frontCardCount = 0;
+        isMatch = false;
+      });
+    } else {
+      _frontCardIndexes.clear();
+      _frontCardCount = 0;
+    }
   }
 }
