@@ -2,7 +2,7 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubits/flip_cards_cubit.dart';
+import '../blocs/flip_cards_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   final String title;
@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: BlocBuilder<FlipCardsCubit, FlipCardsState>(
+      body: BlocBuilder<FlipCardsBloc, FlipCardsState>(
         builder: (context, state) {
           return Center(
             child: Wrap(
@@ -42,10 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   return FlipCard(
                     key: state.flipCards.cardKeys[index],
                     onFlip: () {
-                      context.read<FlipCardsCubit>().flip(index);
+                      context.read<FlipCardsBloc>().add(FlipEvent(index: index));
                     },
                     onFlipDone: (bool) {
-                      context.read<FlipCardsCubit>().flipDone();
+                      context.read<FlipCardsBloc>().add(FlipDoneEvent());
                     },
                     front: Container(
                       width: 90,
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.read<FlipCardsCubit>().reset();
+          context.read<FlipCardsBloc>().add(ResetEvent());
         },
         child: Icon(Icons.refresh),
       ),
